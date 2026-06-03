@@ -1,5 +1,5 @@
 # TURTLE RACING GAME
-# FASTEST TURTLE WINS, FIRST TO REACH THE FINISH LINE IS THE WINNER!
+# FASTEST TURTLE WINS, FIRST TO REACH THE FINISH LINE IS THE WINNER! Place a bet on a turtle and keep winning to stay on the game. If you drop down to 0 $ you loose.
 # TURTLES ARE DEFINED BY THEIR COLOR IN THIS PROGRAM
 
 import turtle
@@ -11,6 +11,8 @@ WIDTH, HEIGHT = 500, 500
 COLORS = ['red', 'green', 'blue', 'orange', 'yellow', 'black', 'purple', 'pink', 'brown', 'cyan']
 
 balance = 50
+
+keep_playing = "y"
 
 def get_number_of_racers():
     racers = 0
@@ -66,9 +68,6 @@ def init_turtle():
     screen.setup(WIDTH, HEIGHT)
     screen.title("Turtle Racing!")
 
-racers = get_number_of_racers()
-print(f"{racers} number of turtles will be racing ...")
-
 init_turtle()
 
 def get_bet():
@@ -76,14 +75,18 @@ def get_bet():
 
     print(f"Your balance is {balance}$")
     if balance <= 0:
-        print("Sorry, your balance is not sufficient. Can not bet ...")
+        print("Sorry, your balance is not sufficient. Can not bet anymore...")
+        return "quit"
     else:
         while True:
             betAmount = input("Enter the amount you want to bet: ")
-            if betAmount.isdigit():
+            try:
                 betAmount = float(betAmount)
-            else:
-                print("Enter a sufficient number...")
+                if betAmount <= 0:
+                    print("Invalid input...")
+                    continue
+            except:
+                print("Invalid input...")
                 continue
             
             if betAmount <= balance:
@@ -108,28 +111,41 @@ def bet_calculation(betAmount, winner, users_turtle):
 
 
 
-
-random.shuffle(COLORS)
-colors = COLORS[:racers] # slice up to 'racers' amount of racers    Ex: [1,2,3,4] [:2] => [1,2]
-
-formatted_colors = " - ".join(colors)
-
 while True:
-    users_turtle = input(f"{formatted_colors} colored turtles will be racing, bet on one: ").lower()
+    if keep_playing == "y":
 
-    if users_turtle not in colors:
-        print("Invalid turtle...")
-        continue
+        racers = get_number_of_racers()
+        print(f"{racers} number of turtles will be racing ...")
+
+        turtle.clearscreen()
+        random.shuffle(COLORS)
+        colors = COLORS[:racers] # slice up to 'racers' amount of racers    Ex: [1,2,3,4] [:2] => [1,2]
+
+        formatted_colors = " - ".join(colors)
+
+        while True:
+            users_turtle = input(f"{formatted_colors} colored turtles will be racing, bet on one: ").lower()
+
+            if users_turtle not in colors:
+                print("Invalid turtle...")
+                continue
+            else:
+                index = colors.index(users_turtle)
+                break
+
+
+        bet_amount = get_bet()
+
+        if bet_amount == "quit":
+            break
+
+        winner = race(colors)
+
+        bet_calculation(bet_amount, winner, users_turtle)
+
+        print(f"Winner turtle is the {winner} turtle")
+
+        keep_playing = input("Do you want to keep on playing (y/n): ")
     else:
-        index = colors.index(users_turtle)
+        print("See you later ...")
         break
-
-
-bet_amount = get_bet()
-
-
-winner = race(colors)
-
-bet_calculation(bet_amount, winner, users_turtle)
-
-print(f"Winner turtle is the {winner} turtle")
